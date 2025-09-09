@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 import { scrapeGMGPrice } from "./scrapers/gmgScraper.js";
 import { scrapeGogPrice } from "./scrapers/gogScraper.js";
@@ -12,6 +13,18 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.use((req, res, next) => {
+    const header = req.headers.authorization || "";
+    const token = header.replace("Bearer ", "");
+
+    try {
+        jwt.verify(token, process.env.JWT_SECRET!);
+        next();
+    } catch {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+});
 
 app.post("/scrape", async (req, res) => {
     const { store, title, gameId } = req.body;
