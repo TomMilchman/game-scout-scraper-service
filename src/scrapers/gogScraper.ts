@@ -25,11 +25,20 @@ export async function scrapeGogPrice(
             const ageBlock = await page.$("div.age-gate.ng-scope");
 
             if (ageBlock) {
-                await page.click("button.age-gate__button");
-                await page.waitForNavigation({
-                    waitUntil: "domcontentloaded",
-                    timeout: 5000,
-                });
+                const confirmButton = await page.waitForSelector(
+                    "button.button.button--big.age-gate__button",
+                    { visible: true }
+                );
+
+                if (confirmButton) {
+                    await Promise.all([
+                        page.waitForNavigation({
+                            waitUntil: "domcontentloaded",
+                            timeout: 5000,
+                        }),
+                        confirmButton.click(),
+                    ]);
+                }
             }
 
             const { basePrice, discountedPrice, currency } =

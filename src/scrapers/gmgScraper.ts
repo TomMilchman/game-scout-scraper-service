@@ -42,14 +42,28 @@ export async function scrapeGMGPrice(
             const ageModal = await page.$("div#birth-date-modal");
 
             if (ageModal) {
+                await page.waitForSelector("select#day", { visible: true });
+                await page.waitForSelector("select#month", { visible: true });
+                await page.waitForSelector("select#year", { visible: true });
+
                 await page.select("select#day", "01");
                 await page.select("select#month", "01");
                 await page.select("select#year", "2000");
-                await page.click("btn.btn-success");
-                await page.waitForNavigation({
-                    waitUntil: "domcontentloaded",
-                    timeout: 5000,
-                });
+
+                const confirmButton = await page.waitForSelector(
+                    "button.btn.btn-success",
+                    { visible: true }
+                );
+
+                if (confirmButton) {
+                    await Promise.all([
+                        page.waitForNavigation({
+                            waitUntil: "domcontentloaded",
+                            timeout: 5000,
+                        }),
+                        confirmButton.click(),
+                    ]);
+                }
             }
 
             const { basePrice, currentPrice, currency } = await page.evaluate(
