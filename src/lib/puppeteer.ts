@@ -6,7 +6,7 @@ export async function getCluster() {
     if (!cluster) {
         cluster = await Cluster.launch({
             concurrency: Cluster.CONCURRENCY_PAGE,
-            maxConcurrency: 3,
+            maxConcurrency: 2,
             puppeteerOptions: {
                 headless: true,
                 args: ["--no-sandbox", "--disable-setuid-sandbox"],
