@@ -17,28 +17,12 @@ export async function scrapeGogPrice(
                 waitUntil: "domcontentloaded",
             });
 
-            if (!response || !response.ok()) {
-                console.warn(`No page found on GOG for ${title}`);
+            if (
+                !response ||
+                !response.ok() ||
+                page.url() !== `https://www.gog.com/en/game/${slug}`
+            ) {
                 return { success: "true", data: null };
-            }
-
-            const ageBlock = await page.$("div.age-gate.ng-scope");
-
-            if (ageBlock) {
-                const confirmButton = await page.waitForSelector(
-                    "button.button.button--big.age-gate__button",
-                    { visible: true }
-                );
-
-                if (confirmButton) {
-                    await Promise.all([
-                        page.waitForNavigation({
-                            waitUntil: "domcontentloaded",
-                            timeout: 5000,
-                        }),
-                        confirmButton.click(),
-                    ]);
-                }
             }
 
             const { basePrice, discountedPrice, currency } =

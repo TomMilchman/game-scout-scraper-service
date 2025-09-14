@@ -17,24 +17,27 @@ export async function scrapeGMGPrice(
                 waitUntil: "domcontentloaded",
             });
 
+            let pageTitle = await page.title();
+
             if (
                 !response ||
                 !response.ok() ||
-                page.url().includes("title-no-longer-available")
+                page.url().includes("title-no-longer-available") ||
+                pageTitle.includes("404 Page")
             ) {
                 url = `https://www.greenmangaming.com/games/${slug}`;
                 response = await page.goto(url, {
                     waitUntil: "domcontentloaded",
                 });
 
+                pageTitle = await page.title();
+
                 if (
                     !response ||
                     !response.ok() ||
-                    page.url().includes("title-no-longer-available")
+                    page.url().includes("title-no-longer-available") ||
+                    pageTitle.includes("404 Page")
                 ) {
-                    console.warn(
-                        `No page found on GreenManGaming for ${title}`
-                    );
                     return { success: "true", data: null };
                 }
             }
@@ -57,11 +60,11 @@ export async function scrapeGMGPrice(
 
                 if (confirmButton) {
                     await Promise.all([
+                        confirmButton.click(),
                         page.waitForNavigation({
                             waitUntil: "domcontentloaded",
                             timeout: 5000,
                         }),
-                        confirmButton.click(),
                     ]);
                 }
             }

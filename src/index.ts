@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 
 import { scrapeGMGPrice } from "./scrapers/gmgScraper.js";
 import { scrapeGogPrice } from "./scrapers/gogScraper.js";
+import type { ScraperResult } from "./types.js";
 
 const PORT = process.env.PORT || 4000;
 
@@ -30,7 +31,7 @@ app.post("/scrape", async (req, res) => {
     const { store, title, gameId } = req.body;
 
     try {
-        let result;
+        let result: ScraperResult;
 
         switch (store) {
             case "GreenManGaming":
@@ -45,7 +46,17 @@ app.post("/scrape", async (req, res) => {
                     .json({ success: false, error: "Unknown store" });
         }
 
-        if ("data" in result) {
+        if (result.success) {
+            if (
+                !result.data ||
+                (result.data.base_price === null &&
+                    result.data.current_price === null)
+            ) {
+                console.warn(`No page found on ${store} for ${title}`);
+            } else {
+                console.log(`Successfully scraped ${title} from ${store}`);
+            }
+
             return res.json({ success: true, data: result.data });
         } else {
             return res.status(500).json({
