@@ -11,7 +11,7 @@ export async function getCluster() {
                 headless: true,
                 args: ["--no-sandbox", "--disable-setuid-sandbox"],
             },
-            timeout: 15000,
+            timeout: 60000,
         });
 
         cluster?.on("taskerror", (err, data) => {
