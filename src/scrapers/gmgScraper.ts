@@ -63,7 +63,6 @@ export async function scrapeGMGPrice(
                         confirmButton.click(),
                         page.waitForNavigation({
                             waitUntil: "domcontentloaded",
-                            timeout: 5000,
                         }),
                     ]);
                 }
